@@ -26,30 +26,32 @@ function GoogleGlyph() {
   );
 }
 
-function SubmitButton() {
+function SubmitButton({ disabled = false }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
 
   return (
     <button
       type="submit"
       className="ziki-auth-g-btn relative flex h-[54px] w-full cursor-pointer items-center justify-center gap-3 rounded-full border border-zk-border text-base font-bold text-zk-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-blue focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={pending}
+      disabled={pending || disabled}
     >
       <GoogleGlyph />
-      <span>{pending ? "Connecting to Google…" : "Continue with Google"}</span>
+      <span>{pending ? "Signing in with Google…" : "Sign in with Google"}</span>
     </button>
   );
 }
 
 export function GoogleSignInButton({
   callbackUrl = "/dashboard",
+  disabled = false,
 }: {
   callbackUrl?: string;
+  disabled?: boolean;
 }) {
   return (
     <form action={googleSignInAction} className="w-full">
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
-      <SubmitButton />
+      <SubmitButton disabled={disabled} />
     </form>
   );
 }

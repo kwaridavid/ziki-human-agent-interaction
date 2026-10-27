@@ -60,6 +60,18 @@ export default auth((req) => {
   const pathWithoutBase = toAppPath(req.nextUrl.pathname);
   const isLoggedIn = !!req.auth?.user;
 
+  // Local presentation mode: keep the public home and sign-in screens visible
+  // while steering the demo away from the rest of the signed-in product.
+  // Production routing and API access are unchanged.
+  if (process.env.NODE_ENV !== "production") {
+    const isPresentationPage = pathWithoutBase === "/" || pathWithoutBase.startsWith("/login");
+    const isNonPageRoute = pathWithoutBase.startsWith("/api/") || pathWithoutBase.startsWith("/_next/");
+    if (isPresentationPage) return NextResponse.next();
+    if (!isNonPageRoute && pathWithoutBase !== "/favicon.ico") {
+      return NextResponse.redirect(new URL(BASE_PATH ? `${BASE_PATH}/login` : "/login", req.nextUrl.origin));
+    }
+  }
+
   // Seamless backwards compatibility: redirect /bugs and /bugs/* to /issues and /issues/*
   if (pathWithoutBase === "/bugs" || pathWithoutBase.startsWith("/bugs/")) {
     const newPath = pathWithoutBase.replace(/^\/bugs/, "/issues");
